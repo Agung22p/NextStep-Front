@@ -620,40 +620,17 @@ class _OnboardingStep4State extends State<OnboardingStep4> {
 }
 
 // 4️⃣ CAREER MATCHING RESULT
-class CareerMatchingResult extends StatefulWidget {
+class CareerMatchingResult extends StatelessWidget {
   const CareerMatchingResult({Key? key}) : super(key: key);
 
   @override
-  State<CareerMatchingResult> createState() => _CareerMatchingResultState();
-}
-
-class _CareerMatchingResultState extends State<CareerMatchingResult> {
-  List<Map<String, dynamic>> _careers = [];
-  bool _loading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadMatches();
-  }
-
-  Future<void> _loadMatches() async {
-    setState(() => _loading = true);
-    final api = ApiService();
-    final list = await api.careerMatch();
-    if (!mounted) return;
-    setState(() {
-      _careers = list ?? [
+  Widget build(BuildContext context) {
+    final careers = [
         {'name': 'Web Developer Junior', 'match': 82, 'skills': 'HTML, PHP, Laravel'},
         {'name': 'UI/UX Designer', 'match': 75, 'skills': 'Figma, Adobe XD, Design Thinking'},
         {'name': 'Digital Marketing', 'match': 68, 'skills': 'SEO, Content Writing, Analytics'},
       ];
-      _loading = false;
-    });
-  }
 
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Rekomendasi Karir'),
@@ -679,17 +656,11 @@ class _CareerMatchingResultState extends State<CareerMatchingResult> {
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
-            if (_loading)
-              const Center(child: CircularProgressIndicator())
-            else
               Expanded(
                 child: ListView.builder(
-                  itemCount: _careers.length,
+                itemCount: careers.length,
                   itemBuilder: (context, index) {
-                    final career = _careers[index];
-                    final match = career['match'] ?? career['score'] ?? 0;
-                    final name = career['name'] ?? career['title'] ?? 'Unknown';
-                    final skills = career['skills'] ?? career['skills_needed'] ?? '';
+                  final career = careers[index];
                     return Card(
                       margin: const EdgeInsets.only(bottom: 16),
                       child: Padding(
@@ -701,7 +672,7 @@ class _CareerMatchingResultState extends State<CareerMatchingResult> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  name.toString(),
+                                career['name'] as String,
                                   style: const TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
@@ -714,7 +685,7 @@ class _CareerMatchingResultState extends State<CareerMatchingResult> {
                                     borderRadius: BorderRadius.circular(20),
                                   ),
                                   child: Text(
-                                    '${match}%',
+                                  '${career['match']}%',
                                     style: TextStyle(
                                       color: Colors.green.shade700,
                                       fontWeight: FontWeight.bold,
@@ -725,7 +696,7 @@ class _CareerMatchingResultState extends State<CareerMatchingResult> {
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              'Skill utama: $skills',
+                            'Skill utama: ${career['skills']}',
                               style: const TextStyle(color: Colors.grey),
                             ),
                             const SizedBox(height: 12),
